@@ -1,14 +1,16 @@
-import logo from './logo.svg';
+import Header from '../components/Header';
 import './App.scss';
+import TableUser from '../components/TableUser';
+import Container from 'react-bootstrap/Container';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <div>
-          <h1> Vuong Khanh Thanh</h1>
-        </div>
-      </header>
+    <div className='app-container'>
+      <Container>
+          <Header />
+          <TableUser />
+      </Container>
+
     </div>
   );
 }
