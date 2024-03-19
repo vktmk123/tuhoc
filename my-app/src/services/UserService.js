@@ -1,8 +1,14 @@
 // import axios from "axios";
 import axios from "./customize-axios";
 
-const fetchAllUsers = () => { 
-    return axios.get('/api/users?page=2');
+const fetchAllUsers = (page) => { 
+    return axios.get(`/api/users?page=${page}`);
   }
 
-export {fetchAllUsers};
+  // Create a new user
+  const postCreateUser = (name, role) => {
+      return axios.post("/api/users", {name:name, role:role});
+  }
+
+  
+export {fetchAllUsers, postCreateUser};

@@ -1,27 +1,37 @@
 import { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import {fetchAllUsers} from '../services/UserService';  
+import ReactPaginate from 'react-paginate';
 
 const TableUser = (props) => {
     const[listUsers, setListUser] = useState([]);
-    
-    useEffect(() => {
-        getUsers();
-    }, [])
+    const[totalUsers, setTotalUsers] = useState(0);
+    const[totalPages, setTotalPages] = useState(0);
 
-    const getUsers = async() => {
-        let res = await fetchAllUsers();
-      
+
+    useEffect(() => {
+      //call api
+      getUsers(1);}, [])
+
+    const getUsers = async(page) => {
+        let res = await fetchAllUsers(page);
         if(res && res.data){
+            setTotalUsers(res.total);
+            setTotalPages(res.total_pages);
             setListUser(res.data);
         }
         console.log("res: ", res);
     }
-    console.log("listUsers: ", listUsers);
+    
+    const handlePageClick = async (event) => {
+      getUsers(+event.selected+1);
+      console.log("event lib:", event)
+    }
 
     return (
         <>
          <Table striped bordered hover>
+
       <thead>
         <tr>
           <th>ID</th>
@@ -31,9 +41,7 @@ const TableUser = (props) => {
         </tr>
       </thead>
       <tbody>
-        {listUsers && listUsers.length > 0 &&
-
-        listUsers.map((user, index) => {
+        {listUsers && listUsers.length > 0 && listUsers.map((user, index) => {
           return (
             <tr key={`index-${index}`}>
               <td>{user.id}</td>
@@ -46,6 +54,27 @@ const TableUser = (props) => {
         }
       </tbody>
     </Table>
+    <ReactPaginate
+        breakLabel="..."
+        nextLabel="next >"
+        onPageChange={handlePageClick} 
+        pageRangeDisplayed={5}
+        pageCount={totalPages}
+        previousLabel="< previous"
+        renderOnZeroPageCount={null}
+        pageClassName='page-item'
+        pageLinkClassName='page-link'
+        previousClassName='page-item'
+        previousLinkClassName='page-link'
+        nextClassName='page-item'
+        nextLinkClassName='page-link'
+        breakClassName='page-item'
+        breakLinkClassName='page-link'
+        containerClassName='pagination'
+        activeClassName='active'
+      />
+    
+
         </>
     );
 }
