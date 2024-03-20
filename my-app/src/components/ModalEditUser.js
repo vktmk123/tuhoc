@@ -3,6 +3,7 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import { useEffect, useState } from "react";
 import { putUpdateUser } from "../services/UserService";
+import { toast } from "react-toastify";
 
 function ModalEditUser(props) {
   const { show, handleClose, dataUserEdit, handleEditUserFromModal } = props;
@@ -18,7 +19,10 @@ function ModalEditUser(props) {
         role: role,
         id: dataUserEdit.id
       })
+      handleClose();
+      toast.success("Edit user success");
     }
+
     console.log("success: ", res);
   }
   
