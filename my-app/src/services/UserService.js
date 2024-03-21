@@ -13,5 +13,9 @@ const fetchAllUsers = (page) => {
   const putUpdateUser = (name, role) => {
     return axios.put("api/users/", {name,role});
   }
+
+  const deleteUser = (id) => {
+    return axios.delete(`/api/users/${id}`);
+  }
   
-export {fetchAllUsers, postCreateUser, putUpdateUser};
+export {fetchAllUsers, postCreateUser, putUpdateUser, deleteUser};
