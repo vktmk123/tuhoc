@@ -5,7 +5,7 @@ const instance = axios.create({
 });
 
 instance.interceptors.response.use(function (response) {
-    console.log("lay: ", response);
+    // console.log("lay: ", response);
     return response.data ? response.data : {status: response.status, message: response.statusText};
 },
     function (error) {

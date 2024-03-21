@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import Table from "react-bootstrap/Table";
 import { fetchAllUsers } from "../services/UserService";
-import ReactPaginate from "react-paginate";
+import ReactPaginate from "react-paginate" ;
 import ModalAddNew from "./ModalAddNew";
 import ModalEditUser from "./ModalEditUser";
 import ModalConfirm from "./ModalConfirm";
-import _, { set } from "lodash";
+import _, { debounce, includes, set } from "lodash";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import '../styles/TableUser.scss';
 
@@ -22,7 +22,10 @@ const TableUser = (props) => {
   const [isShowModalDelete, setIsShowModalDelete] = useState(false);
   const [dataUserDelete, setDataUserDelete] = useState({});
   const [sortBy, setSortBy] = useState('asc');
-  const[sortField, setSortField] = useState('id');
+  const [sortField, setSortField] = useState('id');
+  const [keyword, setKeyword] = useState('');
+
+
 
   const handleClose = () => {
     setIsShowModalAddNew(false);
@@ -92,6 +95,19 @@ const TableUser = (props) => {
     setListUsers(cloneListUsers);
   }
 
+  const handelSearch = debounce( (event) => {
+    
+      let term = event.target.value;
+      console.log("term: ", term);
+      if(term){
+          let cloneListUsers = _.cloneDeep(listUsers);
+          cloneListUsers = cloneListUsers.filter(item => item.email.includes(term));
+          setListUsers(cloneListUsers);
+        }else{
+        getUsers(1);
+      }
+  },500);
+
   return (
     <>
       <div className="my-3 add-new">
@@ -103,6 +119,14 @@ const TableUser = (props) => {
           {" "}
           Add User{" "}
         </button>
+      </div>
+      <div className="col-4 my-3"> 
+        <input className="form-control" 
+              placeholder="Search user by email" 
+              // value={keyword}
+              onChange={(event) =>{
+                handelSearch(event);
+              }}/>
       </div>
       <Table striped bordered hover>
         <thead>
