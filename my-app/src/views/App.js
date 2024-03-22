@@ -4,19 +4,22 @@ import TableUser from "../components/TableUser";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Container from "react-bootstrap/Container";
-
-const handleSaveUser = () => {
-  // some code to save user
-
-  toast.success("User saved successfully");
-};
+import Home from "../components/Home";
+import { Routes, Route } from "react-router-dom";
+import Login from "../components/Login";
 
 function App() {
   return (
     <div className="app-container">
       <Header />
       <Container>
-        <TableUser />
+        
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/users" element={<TableUser />}/>
+          <Route path="/login" element={<Login/>}/> 
+        </Routes>
+        {/* <TableUser /> */}
       </Container>
 
       <ToastContainer

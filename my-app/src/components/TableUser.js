@@ -8,6 +8,9 @@ import ModalConfirm from "./ModalConfirm";
 import _, { debounce, includes, set } from "lodash";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import '../styles/TableUser.scss';
+import { CSVLink, CSVDownload } from "react-csv";
+import Papa from 'papaparse';
+import { toast } from "react-toastify";
 
 
 const TableUser = (props) => {
@@ -24,7 +27,7 @@ const TableUser = (props) => {
   const [sortBy, setSortBy] = useState('asc');
   const [sortField, setSortField] = useState('id');
   const [keyword, setKeyword] = useState('');
-
+  const [dataExort, setDataExport] = useState([]);
 
 
   const handleClose = () => {
@@ -99,26 +102,114 @@ const TableUser = (props) => {
     
       let term = event.target.value;
       console.log("term: ", term);
-      if(term){
+      if(term){  
           let cloneListUsers = _.cloneDeep(listUsers);
           cloneListUsers = cloneListUsers.filter(item => item.email.includes(term));
           setListUsers(cloneListUsers);
-        }else{
+        }
+        else{
         getUsers(1);
       }
   },500);
 
+  const csvData = [
+    ["firstname", "lastname", "email"],
+    ["Ahmed", "Tomi", "ah@smthing.co.com"],
+    ["Raed", "Labes", "rl@smthing.co.com"],
+    ["Yezzi", "Min l3b", "ymin@cocococo.com"]
+  ];
+
+const getUsersExport = (event, done) => {
+    let result = [];
+    if(listUsers && listUsers.length > 0){
+      result.push(["ID", "Email", "First Name", "Last Name"]);
+      listUsers.map((item, index) => {
+        let arr = [];
+            arr[0] = item.id;
+            arr[1] = item.email;
+            arr[2] = item.first_name;
+            arr[3] = item.last_name;
+            result.push(arr);
+      });
+
+      setDataExport(result);
+      done();
+    }
+}
+
+const handleImportCSV = (event) => {
+  if(event.target && event.target.files && event.target.files[0]){
+    let file = event.target.files[0];
+
+    if(file.type !== 'text/csv'){
+      toast.error("File must be csv");
+      return;
+    }
+
+    Papa.parse(file, {
+      // header: true,
+      complete: function(results){
+        let rawCSV  = results.data;
+        if(rawCSV.length > 0) {
+          if(rawCSV[0] && rawCSV[0].length === 3){
+            console.log("rawCSV: ");
+            if(rawCSV[0][0] !== "email"
+            || rawCSV[0][1] !== "first_name"
+            || rawCSV[0][2] !== "last_name"
+            ){
+              toast.error("wrong format csv file");       
+            }else{
+              let result = [];  
+
+              rawCSV.map((item, index) => {
+                if(index >0 && item.length === 3){
+                  let obj = {};
+                  obj.email = item[0];
+                  obj.first_name = item[1];
+                  obj.last_name = item[2];
+                  result.push(obj);
+                }
+              })
+              setListUsers(result); 
+              console.log("result: ", result);          
+          }
+        }else{
+          toast.error("Data is empty");
+        }
+      }else
+          toast.error("not found data file");
+      }
+    });
+  }
+}
   return (
     <>
       <div className="my-3 add-new">
         <h3>List User: </h3>
-        <button
+        <div className="group-button">
+
+          <label htmlFor="test" className="btn btn-warning">
+          <i className="fa-solid fa-file-import mx-1"></i>import
+          </label>
+          <input id="test" type="file" hidden 
+          onChange={(event) => handleImportCSV(event)}/>
+
+          <CSVLink 
+          data={dataExort}
+          filename={"user.csv"}
           className="btn btn-primary"
-          onClick={() => setIsShowModalAddNew(true)}
-        >
-          {" "}
-          Add User{" "}
+          asyncOnClick={true}
+          onClick={getUsersExport}
+          >
+          <i className="fa-solid fa-file-arrow-down mx-1">
+          </i>Export</CSVLink>    
+        <button
+          className="btn btn-success"
+          onClick={() => setIsShowModalAddNew(true)}>
+          <i className="fa-solid fa-circle-plus mx-1"></i>
+          Add User
         </button>
+        </div>
       </div>
       <div className="col-4 my-3"> 
         <input className="form-control" 
