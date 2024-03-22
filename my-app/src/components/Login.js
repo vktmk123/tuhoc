@@ -1,11 +1,14 @@
-import{ useEffect, useState } from 'react';
+import{ useEffect, useState, useContext } from 'react';
 import { loginApi } from '../services/UserService';
 import {toast} from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../context/UserContext';
 
 const Login = () => {
 
     const navigate = useNavigate();
+
+    const {loginContext} = useContext(UserContext);
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -17,7 +20,7 @@ const Login = () => {
         if(token){
             navigate('/');
         }
-    },[]);
+    }, []);
 
     const handleLogin = async () => {
         if(!email || !password){
@@ -30,9 +33,10 @@ const Login = () => {
         let res = await loginApi(email, password);
         console.log("user res:", res);
         if(res && res.token){
+            loginContext(email, res.token);
+            navigate("/");
             toast.success('Login success');
-            localStorage.setItem('token', res.token);
-            navigate('/');
+            
         }else{
             if(res && res.status === 400){
                 toast.error(res.data.error);
